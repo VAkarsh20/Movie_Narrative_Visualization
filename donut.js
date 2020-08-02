@@ -24,36 +24,31 @@ var disney =  ["Walt Disney Studios Motion Pictures", "Twentieth Century Fox", "
 var data1 = {"Walt Disney Studios Motion Pictures": 83299918370, "Twentieth Century Fox" : 52795884688, "Fox Searchlight Pictures":1930977401, "UTV Motion Pictures":303723636}
 var data2 = {"Walt Disney Studios Motion Pictures": 151, "Twentieth Century Fox" : 132, "Fox Searchlight Pictures": 8, "UTV Motion Pictures": 1}
 
+var data1_total = 0
+var data2_total = 0
+
+for (var i = 0; i < disney.length; i++) {
+
+  data1_total += data1[disney[i]];
+  data2_total += data2[disney[i]];
+}
+
+
 // set the color scale
 var color = d3.scaleOrdinal()
   .domain(disney)
-  .range(d3.schemeDark2);
+  .range(d3.schemeTableau10);
 
-
-// var tooltip = d3.select("#chart")
-//   .append("div")
-//   .style("opacity", 0)
-//   .attr("class", "tooltip")
-//   .style("background-color", "blue")
-//   .style("border", "solid")
-//   .style("border-width", "2px")
-//   .style("border-radius", "5px")
-//   .style("padding", "5px")
-//   .append('div')
-//     .attr('class', 'label')
-//     .attr('class', 'count');
-
-
-var tooltip = d3.select('#chart')                               // NEW
-          .append('div')                                                // NEW
-          .attr('class', 'tooltip');                                    // NEW
-
-
-          tooltip.append('div')                                           // NEW
-            .attr('class', 'label');                                      // NEW
-
-          tooltip.append('div')                                           // NEW
-            .attr('class', 'count');                                      // NEW                                 // NEW
+var tooltip = d3.select("#chart")
+  .append("div")
+  .style("opacity", 0)
+  .attr("class", "tooltip")
+  .style("position", "absolute")
+  .style("background-color", "white")
+  .style("border", "solid")
+  .style("border-width", "2px")
+  .style("border-radius", "5px")
+  .style("padding", "5px");
 
 
 
@@ -84,16 +79,14 @@ function update(data) {
     .attr('fill', function(d){ return(color(d.data.key)) })
     .attr("stroke", "white")
     .style("stroke-width", "2px")
-    .style("opacity", 1)
+    .style("opacity", 0.5)
 
   u
-    .on('mouseover', function(d) {
-
-      tooltipFunction(d, "over")})
+    .on('mouseover', function(d) { console.log("HERE"); this.style.opacity = 1; tooltipFunction(d, "over")})
   u
     .on('mousemove', function(d) { tooltipFunction(d, "move")})
   u
-    .on('mouseout', function(d) { tooltipFunction(d, "out") });
+    .on('mouseout', function(d) { this.style.opacity = 0.5; tooltipFunction(d, "out") });
 
 
 
@@ -124,32 +117,6 @@ function update(data) {
             .text(function(d) { return d; });
 
 
-
-            // u.on('mouseover', function(d) {                            // NEW
-            //           // var total = d3.sum(dataset.map(function(d) {                // NEW
-            //           //   return d.count;                                           // NEW
-            //           // }));                                                        // NEW
-            //           // var percent = Math.round(1000 * d.data.count / total) / 10; // NEW
-            //
-            //           console.log(d.data.key)
-            //           console.log(d.data.value)
-            //
-            //           tooltip.select('.label').html(d.data.key);                // NEW
-            //           tooltip.select('.count').html(d.data.value);                // NEW
-            //           // tooltip.select('.percent').html(percent + '%');             // NEW
-            //           tooltip.style('display', 'block');                          // NEW
-            //         });                                                           // NEW
-            //
-            // u.on('mouseout', function() {                              // NEW
-            //   tooltip.style('display', 'none');                           // NEW
-            // });
-            // u.on('mousemove', function(d) {                            // NEW
-            //         tooltip.style('top', (d3.event.pageY + 10) + 'px')          // NEW
-            //           .style('left', (d3.event.pageX + 10) + 'px');             // NEW
-            //       });
-
-
-
   // remove the group that is not present anymore
   u
     .exit()
@@ -162,17 +129,40 @@ function tooltipFunction(d, action) {
   switch (action) {
     case "over":
 
-      tooltip.style("display", "block");
+      tooltip.style("opacity", 1);
       return;
     case "move":
-      tooltip.select('.label').html(d.data.key);
-      tooltip.select('.count').html(d.data.value);
+
+
+
+
+      if (d.data.value > 200) {
+        tooltip.html('<u>' + d.data.key + '</u>'
+                      + "<br>" + "Studio Total Lifetime Gross: $"+ grossToString(d.data.value)
+                      + "<br>" + "Disney Total Lifetime Gross: $"+ grossToString(data1_total)
+                      + "<br>" + "Percentage: "+ Math.round(1000 * d.data.value / data1_total) / 10);
+      } else {
+
+        tooltip.html('<u>' + d.data.key + '</u>'
+                      + "<br>" + "Studio Movie Count:  " + d.data.value
+                      + "<br>" + "Disney Movie Count: "+ data2_total
+                      + "<br>" + "Percentage: "+ Math.round(1000 * d.data.value / data2_total) / 10 + "%");
+      }
+
+
+
       tooltip.style('top', (d3.event.pageY + 10) + 'px')
               .style('left', (d3.event.pageX + 10) + 'px');
       return;
     default:
-      tooltip.style("display", "none");
+      tooltip.style("opacity", 0);
   }
+}
+
+function grossToString(value) {
+
+// https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 

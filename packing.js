@@ -84,6 +84,10 @@ DATA.then(function(data) {
 
   function dataCleaner(data) {
 
+    var disney =  ["Walt Disney Studios Motion Pictures", "Twentieth Century Fox", "Fox Searchlight Pictures", "UTV Motion Pictures"];
+    var data = data.filter(function(d){return (d.US_Distributor == disney[0]) || (d.US_Distributor == disney[1]) || (d.US_Distributor == disney[2]) || (d.US_Distributor == disney[3])})
+
+
     var directors = d3.map();
     for (var i = 0; i < data.length; i++) {
 
@@ -129,6 +133,8 @@ DATA.then(function(data) {
       tooltip.html('<u>' + d.Director + '</u>' + "<br>" + d.Films + " Films")
         .style("left", (d3.mouse(this)[0]+20) + "px")
         .style("top", (d3.mouse(this)[1]) + "px")
+          // .style('top', (d3.event.pageY + 10) + 'px')
+          // .style('left', (d3.event.pageX + 10) + 'px');
         return;
       default:
         tooltip.style("opacity", 0);
