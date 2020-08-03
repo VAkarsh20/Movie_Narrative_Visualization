@@ -2,28 +2,31 @@
 // https://www.d3-graph-gallery.com/graph/pie_changeData.html
 // https://bl.ocks.org/cflavs/ff1c6005fd7edad32641
 
+// Overall Structure and animation taken from the following links
+// https://www.d3-graph-gallery.com/graph/pie_changeData.html
 
-
-// set the dimensions and margins of the graph
-var width = 450
-    height = 450
+// Dimensions
+var width = 1200
+    height = 500
     margin = 50
 
-// The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+// Radius
 var radius = Math.min(width, height) / 2 - margin
 
-// append the svg object to the div called 'my_dataviz'
+// Creating svg object
 var svg = d3.select("#chart")
   .append("svg")
-    .attr("width", width + 3 * margin)
-    .attr("height", height + 3 * margin)
+    .attr("width", width + 2 * margin)
+    .attr("height", height + 2 * margin)
   .append("g")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+// Data and Labels (Tried to parse data but failed so hard coded)
 var disney =  ["Walt Disney Studios Motion Pictures", "Twentieth Century Fox", "Fox Searchlight Pictures", "UTV Motion Pictures"];
 var data1 = {"Walt Disney Studios Motion Pictures": 83299918370, "Twentieth Century Fox" : 52795884688, "Fox Searchlight Pictures":1930977401, "UTV Motion Pictures":303723636}
 var data2 = {"Walt Disney Studios Motion Pictures": 151, "Twentieth Century Fox" : 132, "Fox Searchlight Pictures": 8, "UTV Motion Pictures": 1}
 
+// Finding Totals for the data
 var data1_total = 0
 var data2_total = 0
 
@@ -34,11 +37,14 @@ for (var i = 0; i < disney.length; i++) {
 }
 
 
-// set the color scale
+// Color Coding based on Disney Studio
 var color = d3.scaleOrdinal()
   .domain(disney)
-  .range(d3.schemeTableau10);
+  .range(["#4e79a7", "Turquoise", "Aqua", "Teal"]);
 
+// Tooltip code was inspired from the following links
+// https://www.d3-graph-gallery.com/graph/circularpacking_template.html
+// https://www.linkedin.com/learning/d3-js-essential-training-for-data-scientists/making-your-graphic-responsive?u=43607124
 var tooltip = d3.select("#chart")
   .append("div")
   .style("opacity", 0)
@@ -52,20 +58,20 @@ var tooltip = d3.select("#chart")
 
 
 
-// A function that create / update the plot for a given variable:
+// Create and update the bars
 function update(data) {
 
-  // Compute the position of each group on the pie:
+  // Creating Pie
   var pie = d3.pie()
     .value(function(d) {return d.value; })
-    .sort(function(a, b) { return d3.ascending(a.key, b.key);} ) // This make sure that group order remains the same in the pie chart
+    .sort(function(a, b) { return d3.ascending(a.key, b.key);} )
   var data_ready = pie(d3.entries(data))
 
-  // map to data
+  // Maping Data to arcs
   var u = svg.selectAll("path")
     .data(data_ready)
 
-  // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+  // Creating Donut chart with arcs
   u
     .enter()
     .append('path')
@@ -82,7 +88,7 @@ function update(data) {
     .style("opacity", 0.5)
 
   u
-    .on('mouseover', function(d) { console.log("HERE"); this.style.opacity = 1; tooltipFunction(d, "over")})
+    .on('mouseover', function(d) { this.style.opacity = 1; tooltipFunction(d, "over")})
   u
     .on('mousemove', function(d) { tooltipFunction(d, "move")})
   u
@@ -90,40 +96,41 @@ function update(data) {
 
 
 
-  var legendRectSize = 18;
-  var legendSpacing = 4;
-  var legend = svg.selectAll('.legend')
-            .data(color.domain())
-            .enter()
-            .append('g')
-            .attr('class', 'legend')
-            .attr('transform', function(d, i) {
-              var height = legendRectSize + legendSpacing;
-              var offset =  height * color.domain().length / 2;
-              var horz = -2 * legendRectSize;
-              var vert = i * height - offset;
-              return 'translate(' + (5 * margin + horz) + ',' + vert + ')';
-            });
+  // Legend Code was inspired by the following link
+  // https://www.d3-graph-gallery.com/graph/custom_legend.html
+  // Creating Colors
+  var size = 20
+  svg.selectAll("dots")
+    .data(disney)
+    .enter()
+    .append("rect")
+      .attr("x", width * 0.25)
+      .attr("y", function(d,i){ return height * 0.00000001 + i*(size+5)})
+      .attr("width", size)
+      .attr("height", size)
+      .style("fill", function(d){ return color(d)})
 
-          legend.append('rect')
-            .attr('width', legendRectSize)
-            .attr('height', legendRectSize)
-            .style('fill', color)
-            .style('stroke', color);
+  // Creating Text
+  svg.selectAll("labels")
+    .data(disney)
+    .enter()
+    .append("text")
+      .attr("x", width * 0.25 + size * 1.2)
+      .attr("y", function(d,i){ return height * 0.00000001 + i*(size+5) + (size * 0.5)})
+      .style("fill", "black")
+      .text(function(d){ return d})
+      .attr("text-anchor", "left")
+      .style("alignment-baseline", "middle")
 
-          legend.append('text')
-            .attr('x', legendRectSize + legendSpacing)
-            .attr('y', legendRectSize - legendSpacing)
-            .text(function(d) { return d; });
 
-
-  // remove the group that is not present anymore
+  // Getting rid of groups not there anymore
   u
     .exit()
     .remove()
 
 }
 
+// Tooltip helper function
 function tooltipFunction(d, action) {
 
   switch (action) {
@@ -132,9 +139,6 @@ function tooltipFunction(d, action) {
       tooltip.style("opacity", 1);
       return;
     case "move":
-
-
-
 
       if (d.data.value > 200) {
         tooltip.html('<u>' + d.data.key + '</u>'
@@ -159,160 +163,12 @@ function tooltipFunction(d, action) {
   }
 }
 
+// Code to transfer numeral to money representation string inspired from the following link
+// https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
 function grossToString(value) {
 
-// https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-
-
-// Initialize the plot with the first dataset
+// Plot initalization
 update(data1);
-
-
-
-
-
-
-
-
-
-
-// // set the dimensions and margins of the graph
-// var width = 450
-//     height = 450
-//     margin = 40
-//
-// // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
-// var radius = Math.min(width, height) / 2 - margin
-//
-// // append the svg object to the div called 'my_dataviz'
-// var svg = d3.select("#chart")
-//   .append("svg")
-//     .attr("width", width)
-//     .attr("height", height)
-//   .append("g")
-//     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-//
-//
-// // A function that create / update the plot for a given variable:
-// function update(selectedVar) {
-//
-//   // Parse the Data
-//   csv = "movies.csv";
-//   const DATA = d3.csv(csv)
-//   DATA.then(function(data) {
-//
-//     var disney =  ["Walt Disney Studios Motion Pictures", "Twentieth Century Fox", "Fox Searchlight Pictures", "UTV Motion Pictures"];
-//     var labels = ["Walt Disney Studios", "NBCUniversal", "ViacomCBS", "WarnerMedia", "Sony Pictures", "Mini-majors", "Other"];
-//     var data = dataCleaner(data)
-//
-//     var data1 = data[0];
-//     var data2 = data[1];
-//
-//     // var data1 = {"Walt Disney Studios Motion Pictures": 83299918370, "Twentieth Century Fox" : 52795884688, "Fox Searchlight Pictures":1930977401, "UTV Motion Pictures":303723636}
-//     // var data2 = {"Walt Disney Studios Motion Pictures": 151, "Twentieth Century Fox" : 132, "Fox Searchlight Pictures": 8, "UTV Motion Pictures": 1}
-//
-//
-//     console.log(typeof selectedVar)
-//
-//     var data = selectedVar === "data1" ? data1 : data2;
-//
-//
-//     // set the color scale
-//     var color = d3.scaleOrdinal()
-//       .domain(disney)
-//       .range(d3.schemeDark2);
-//
-//
-//     // Compute the position of each group on the pie:
-//     var pie = d3.pie()
-//       .value(function(d) {return d.value; })
-//       .sort(function(a, b) { return d3.ascending(a.key, b.key);} ) // This make sure that group order remains the same in the pie chart
-//     var data_ready = pie(d3.entries(data))
-//
-//     // map to data
-//     var u = svg.selectAll("path")
-//       .data(data_ready)
-//
-//     // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-//     u
-//       .enter()
-//       .append('path')
-//       .merge(u)
-//       .transition()
-//       .duration(1000)
-//       .attr('d', d3.arc()
-//         .innerRadius(100)
-//         .outerRadius(radius)
-//       )
-//       .attr('fill', function(d){ return(color(d.data.key)) })
-//       .attr("stroke", "white")
-//       .style("stroke-width", "2px")
-//       .style("opacity", 1)
-//
-//     // remove the group that is not present anymore
-//     u
-//       .exit()
-//       .remove()
-//
-//
-//
-//
-//
-//
-//
-//     function dataCleaner(data) {
-//
-//       // var res = new Array(labels.length);
-//
-//       var data = data.filter(function(d){return (d.US_Distributor == disney[0]) || (d.US_Distributor == disney[1]) || (d.US_Distributor == disney[2]) || (d.US_Distributor == disney[3])})
-//
-//
-//       var gross = {}
-//       var count = {}
-//
-//       for (var i = 0; i < disney.length; i++) {
-//
-//         gross[disney[i]] = 0;
-//         count[disney[i]] = 0;
-//       }
-//
-//
-//
-//       for (var i = 0; i < data.length; i++) {
-//
-//         resIdx = disney.indexOf(data[i]["US_Distributor"])
-//
-//         gross[disney[resIdx]] += parseInt(data[i].Lifetime_Gross)
-//         count[disney[resIdx]] += 1
-//
-//       }
-//
-//       return [gross, count]
-//     }
-//
-//     function studioParentFinder(distributor) {
-//
-//         var disney = ["Walt Disney Studios Motion Pictures", "Twentieth Century Fox", "Fox Searchlight Pictures", "UTV Motion Pictures"];
-//         var universal = ["Universal Pictures", "Focus Features", "Gramercy Pictures (I)", "USA Films", "FilmDistrict"]
-//         var viacom = ["Paramount Pictures", "Miramax"]
-//         var warner = ["Warner Bros.", "New Line Cinema"]
-//         var sony = ["Sony Pictures Releasing", "TriStar Pictures", "Screen Gems", "Columbia Pictures", "Sony Pictures Classics", "FUNimation Entertainment"]
-//         var miniMajor = ["DreamWorks", "DreamWorks Distribution", "Lionsgate", "Summit Entertainment", "Artisan Entertainment", "Metro-Goldwyn-Mayer (MGM)", "Orion Pictures", "United Artists", "United Artists Releasing", "STX Entertainment"]
-//
-//         var groups = [disney, universal, viacom, warner, sony, miniMajor];
-//
-//         for (var i = 0; i < groups.length; i++) {
-//
-//           if (groups[i].includes(distributor)) { return labels[i]; }
-//         }
-//
-//         return "Other";
-//     }
-//   })
-// }
-//
-// // Initialize plot
-// update('data1')

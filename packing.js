@@ -1,58 +1,67 @@
+
+// Overall Structure, dragging, and force simulation taken from the following links
+// https://www.d3-graph-gallery.com/graph/circularpacking_template.html
+
 var circlePackingDiv = document.querySelector("#chart");
 
-// var width = barChartDiv.clientWidth;
-// var height = 700;
-
-var height = 460;
-var width = 760;
-var margin = 50;
-
+// Dimensions
+var margin = {top: 50, right: 60, bottom: 160, left: 150},
+    width = 1200 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
 
 var svg = d3.select(circlePackingDiv)
   .append("svg")
-    .attr("width", width)
-    .attr("height", height)
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform",
-          "translate(" + margin + "," + margin + ")");
+          "translate(" + margin.left + "," + margin.top + ")");
+
+
 
 
 const DATA = d3.csv("movies.csv");
-
-
 DATA.then(function(data) {
 
-  var distributors = d3.map(data, function(d){ return d.US_Distributor; }).keys();
-
+  // Data Filtering
   var data = dataCleaner(data)
-
   var boxOfficeList = d3.map(data, function(d){ return d.TotalLifetimeGross; }).keys();
 
+  // Radius
   var r = d3.scaleLinear()
     .domain([Math.min(...boxOfficeList), Math.max(...boxOfficeList)])
     .range([7,55])
 
+  // Color coding the values based on Number of films in the data
+  var labels = ["6+", "5", "4", "3", "2", "1"]
   var color = d3.scaleOrdinal()
-    .domain(["6+", "5", "4", "3", "2", "1"])
-    .range(d3.schemeTableau10);
+    .domain(labels)
+    .range(d3.schemeSet2);
 
+
+  // Simulation
   var simulation = d3.forceSimulation()
-      .force("center", d3.forceCenter().x(width / 2).y(height / 2)) // Attraction to the center of the svg area
-      .force("charge", d3.forceManyBody().strength(.1)) // Nodes are attracted one each other of value is > 0
-      .force("collide", d3.forceCollide().strength(.2).radius(function(d){ return (r(d.TotalLifetimeGross)+3) }).iterations(1)) // Force that avoids circle overlapping
+      .force("center", d3.forceCenter().x(width / 2).y(height / 2))
+      .force("charge", d3.forceManyBody().strength(.1))
+      .force("collide", d3.forceCollide().strength(.2).radius(function(d){ return (r(d.TotalLifetimeGross)+3) }).iterations(1))
 
 
+  // Tooltip code was inspired from the following links
+  // https://www.d3-graph-gallery.com/graph/circularpacking_template.html
+  // https://www.linkedin.com/learning/d3-js-essential-training-for-data-scientists/making-your-graphic-responsive?u=43607124
   var tooltip = d3.select("#chart")
     .append("div")
     .style("opacity", 0)
     .attr("class", "tooltip")
+    .style("position", "absolute")
     .style("background-color", "white")
     .style("border", "solid")
     .style("border-width", "2px")
     .style("border-radius", "5px")
     .style("padding", "5px");
 
+  // Creating Circles
   var node = svg.append("g")
     .selectAll("circle")
     .data(data)
@@ -82,6 +91,34 @@ DATA.then(function(data) {
             .attr("cy", function(d){ return d.y; })
       });
 
+
+  // Legend Code was inspired by the following link
+  // https://www.d3-graph-gallery.com/graph/custom_legend.html
+  // Creating Colors
+  var size = 20
+  svg.selectAll("dots")
+    .data(labels)
+    .enter()
+    .append("rect")
+      .attr("x", width * 0.85)
+      .attr("y", function(d,i){ return height / 8 + i*(size+5)})
+      .attr("width", size)
+      .attr("height", size)
+      .style("fill", function(d){ return color(d)})
+
+  // Creating Text
+  svg.selectAll("labels")
+    .data(labels)
+    .enter()
+    .append("text")
+      .attr("x", width * 0.85 + size*1.2)
+      .attr("y", function(d,i){ return height / 8 + i*(size+5) + (size/2)})
+      .style("fill", "black")
+      .text(function(d){ return (d + " Films"); })
+      .attr("text-anchor", "left")
+      .style("alignment-baseline", "middle")
+
+  // Helper Function to Clean Data
   function dataCleaner(data) {
 
     var disney =  ["Walt Disney Studios Motion Pictures", "Twentieth Century Fox", "Fox Searchlight Pictures", "UTV Motion Pictures"];
@@ -117,12 +154,14 @@ DATA.then(function(data) {
     return data;
   }
 
+  // Color Coder Function
   function colorCoder(point){
 
     films = point.length;
     return (films >= 6) ? "6+" : films.toString();
   };
 
+  // Tooltip helper function
   function tooltipFunction(d, action) {
 
     switch (action) {
@@ -130,17 +169,25 @@ DATA.then(function(data) {
         tooltip.style("opacity", 1);
         return;
       case "move":
-      tooltip.html('<u>' + d.Director + '</u>' + "<br>" + d.Films + " Films")
-        .style("left", (d3.mouse(this)[0]+20) + "px")
-        .style("top", (d3.mouse(this)[1]) + "px")
-          // .style('top', (d3.event.pageY + 10) + 'px')
-          // .style('left', (d3.event.pageX + 10) + 'px');
+
+        movies = ""
+
+        for (var i = 0; i < d.Films.length; i++) {
+
+          if (i != (d.Films.length - 1)) { movies += d.Films[i] + ", "; }
+          else { movies += d.Films[i]; }
+        }
+
+        tooltip.html('<u>' + d.Director + '</u>' + "<br>" + "Disney Films: " + movies)
+          .style('top', (d3.event.pageY + 10) + 'px')
+          .style('left', (d3.event.pageX + 10) + 'px');
         return;
       default:
         tooltip.style("opacity", 0);
     }
   }
 
+  // Dragging Function
   function dragFunction(d, action) {
 
     switch (action) {
@@ -160,4 +207,3 @@ DATA.then(function(data) {
     }
   }
 });
-// .catch( function(d) { console.log("Error")});

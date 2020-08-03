@@ -1,9 +1,13 @@
-// set the dimensions and margins of the graph
-var margin = {top: 30, right: 30, bottom: 70, left: 60},
-    width = 460 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
 
-// append the svg object to the body of the page
+// Overal Structure, Animation, and Buttons of bargraph was inspired by this link
+// https://www.d3-graph-gallery.com/graph/barplot_button_data_simple.html
+
+// Dimensions
+var margin = {top: 10, right: 60, bottom: 160, left: 150},
+    width = 1200 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// Creating svg object
 var svg = d3.select("#chart")
   .append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -12,48 +16,48 @@ var svg = d3.select("#chart")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-// Initialize the X axis
+// X and Y plus Axises
 var x = d3.scaleBand()
   .range([ 0, width ])
   .padding(0.2);
 var xAxis = svg.append("g")
   .attr("transform", "translate(0," + height + ")")
 
-// Initialize the Y axis
 var y = d3.scaleLinear()
   .range([ height, 0]);
 var yAxis = svg.append("g")
   .attr("class", "myYaxis")
 
-// A function that create / update the plot for a given variable:
+// Create and update the bars
 function update(selectedVar) {
 
-  // Parse the Data
+  // Data parser
   csv = "movies.csv";
   const DATA = d3.csv(csv)
   DATA.then(function(data) {
 
+    // Labels and data cleanup
     var labels = ["Walt Disney Studios", "NBCUniversal", "ViacomCBS", "WarnerMedia", "Sony Pictures", "Mini-majors", "Other"];
     var data = dataCleaner(data)
 
-    // Color scale: give me a specie name, I return a color
+    // Color coding based on labels
     var color = d3.scaleOrdinal()
       .domain(labels)
       .range(d3.schemeTableau10)
 
-    // X axis
+    // X axis for data
     x.domain(data.map(function(d) { return d["Studio Parent"]; }))
     xAxis.transition().duration(1000).call(d3.axisBottom(x))
 
-    // Add Y axis
+    // Y axis for data
     y.domain([0, d3.max(data, function(d) { return +d[selectedVar] }) ]);
     yAxis.transition().duration(1000).call(d3.axisLeft(y));
 
-    // variable u: map data to existing bars
+    // Map data to existing bars
     var u = svg.selectAll("rect")
       .data(data)
 
-    // update bars
+    // Update bars
     u
       .enter()
       .append("rect")
@@ -68,9 +72,7 @@ function update(selectedVar) {
         .attr("opacity", 1);
 
 
-
-
-
+      // Helper function to clean up data
       function dataCleaner(data) {
 
         var res = new Array(labels.length);
@@ -94,6 +96,7 @@ function update(selectedVar) {
         return res
       }
 
+      // Find parent studio based on distributor
       function studioParentFinder(distributor) {
 
           var disney = ["Walt Disney Studios Motion Pictures", "Twentieth Century Fox", "Fox Searchlight Pictures", "UTV Motion Pictures"];
@@ -115,5 +118,5 @@ function update(selectedVar) {
   })
 }
 
-// Initialize plot
+// Plot initalization
 update('Total Lifetime Gross')
