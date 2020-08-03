@@ -7,6 +7,14 @@
     <h1 style="text-align:center"> Top 1000 Grossing Movies Narrative Visualization</h1>
     <script script src="https://d3js.org/d3.v5.min.js" aysnc></script>
 
+    <p> In this project for CS 498 Data Visualization, I chose to analyze the top 1000 highest grossing movies of all time to create a narrative visualization to show which major studio parents have generally had the highest success at the box office.
+      The major studio parents are NBCUniversal, ViacomCBS, WarnerMedia, Walt Disney Studios, and Sony Pictures.
+      Along with the major studios, mini-major studios such as Lionsgate, The Amblin Group, STX Films, and MGM were clumped into one category as they are smaller studios looking to compete with major studios.
+      If a movie did not fit into either a major or the mini-major category, the film was placed in Other.
+      The overall structure of the narrative visualization is an interactive slideshow that is broken up into the following four scenes: a bar chart that shows films that have grossed over a billion dollars, a bar chart to show how well the studio labels have performed against each other, A donut chart to show the best performing studio and how much their child studios make up their overall success, and a circle packing chart to show the best performing directors for the best performing studio.
+      The data was taken from SaiVamshiAtukuri's dataset "Collections of top grossing movies" on Kaggle, and the link for the dataset is the following: https://www.kaggle.com/saivamshi/collections-of-top-grossing-movies/version/2/. Once the data was collected, I ran the data through a python script to join the different CSV files into a single CSV file to use, called movies.csv.
+      In movies.csv, there are 1000 records for the number of movies in the dataset, and the columns for the file are the following: Rank, Movie_ID, Movie_Name, Director, Year, US_Distributor, Lifetime_Gross, Budget, MPAA, Running_Time, and Genre.
+    </p>
 
   </head>
 
@@ -20,6 +28,10 @@
 
     <div id="chart"></div>
     <script src = "packing.js" async></script>
+
+    <p>
+      The final scene of the Interactive Slideshow Narrative Visualization is a circle packing chart that shows how well Directors have performed for Walt Disney Studios. The Size of the circle is meant to show Total Lifetime Gross and the colors represent how many movies directed for Disney. This circle packing chart was chosen to show whether or not some directors made an impact on the success of Disney. From the chart, it was seen that the Russo Brothers were the most successful as they were the largest bubble, mostly for directing the last two Avengers Movies and two Captian America Moves. Overall, the narrative visualization showed how Walt Disney Studios was the most successful of all the movies that were in the top 1000 grossing films.
+    </p>
 
 
 

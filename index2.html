@@ -7,6 +7,14 @@
     <h1 style="text-align:center"> Top 1000 Grossing Movies Narrative Visualization</h1>
     <script script src="https://d3js.org/d3.v5.min.js" aysnc></script>
 
+    <p> In this project for CS 498 Data Visualization, I chose to analyze the top 1000 highest grossing movies of all time to create a narrative visualization to show which major studio parents have generally had the highest success at the box office.
+      The major studio parents are NBCUniversal, ViacomCBS, WarnerMedia, Walt Disney Studios, and Sony Pictures.
+      Along with the major studios, mini-major studios such as Lionsgate, The Amblin Group, STX Films, and MGM were clumped into one category as they are smaller studios looking to compete with major studios.
+      If a movie did not fit into either a major or the mini-major category, the film was placed in Other.
+      The overall structure of the narrative visualization is an interactive slideshow that is broken up into the following four scenes: a bar chart that shows films that have grossed over a billion dollars, a bar chart to show how well the studio labels have performed against each other, A donut chart to show the best performing studio and how much their child studios make up their overall success, and a circle packing chart to show the best performing directors for the best performing studio.
+      The data was taken from SaiVamshiAtukuri's dataset "Collections of top grossing movies" on Kaggle, and the link for the dataset is the following: https://www.kaggle.com/saivamshi/collections-of-top-grossing-movies/version/2/. Once the data was collected, I ran the data through a python script to join the different CSV files into a single CSV file to use, called movies.csv.
+      In movies.csv, there are 1000 records for the number of movies in the dataset, and the columns for the file are the following: Rank, Movie_ID, Movie_Name, Director, Year, US_Distributor, Lifetime_Gross, Budget, MPAA, Running_Time, and Genre.
+    </p>
 
   </head>
 
@@ -17,11 +25,17 @@
       <a href="index3.html"><button>Scene 3</button></a>
     </div>
 
+    <h3> Bar Chart of Studio Groupings to see Success in terms of Total Lifetime Gross and Movie Count</h3>
+
     <button onclick="update('Total Lifetime Gross')">Total Lifetime Gross</button>
     <button onclick="update('Count')">Count</button>
 
     <div id="chart"></div>
     <script src = "barchart2.js" aysnc></script>
+
+    <p>
+      The second scene of the Interactive Slideshow Narrative Visualization is a bar chart with two interactive parameters to see the success of the movie studio groupings in comparison to Total Lifetime Gross and Movie Count for movies in the Top 1000 grossing films. This chart is different from the first one as it looks at the movie studio parents as a whole and over the entire dataset, while the first shows each movie that has grossed over a billion dollars. The colors are kept the same as the first to be consistent with what the data is trying to show for the groupings. The interactive parameters are triggered by the two buttons Total Lifetime Gross and Movie Count. This changes the y-axis to display their respective parameter units, dollars for the former and count for the latter. The graph showed the Walt Disney Studios performed the best in both interactive categories in a heavy margin when compared to the other categories. A reason for this may be due to the success of the studio throughout its history and its acquisition of Fox and its movie rights.
+    </p>
 
   </body>
 </html>

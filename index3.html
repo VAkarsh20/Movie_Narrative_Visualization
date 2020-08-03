@@ -7,6 +7,14 @@
     <h1 style="text-align:center"> Top 1000 Grossing Movies Narrative Visualization</h1>
     <script script src="https://d3js.org/d3.v5.min.js" aysnc></script>
 
+    <p> In this project for CS 498 Data Visualization, I chose to analyze the top 1000 highest grossing movies of all time to create a narrative visualization to show which major studio parents have generally had the highest success at the box office.
+      The major studio parents are NBCUniversal, ViacomCBS, WarnerMedia, Walt Disney Studios, and Sony Pictures.
+      Along with the major studios, mini-major studios such as Lionsgate, The Amblin Group, STX Films, and MGM were clumped into one category as they are smaller studios looking to compete with major studios.
+      If a movie did not fit into either a major or the mini-major category, the film was placed in Other.
+      The overall structure of the narrative visualization is an interactive slideshow that is broken up into the following four scenes: a bar chart that shows films that have grossed over a billion dollars, a bar chart to show how well the studio labels have performed against each other, A donut chart to show the best performing studio and how much their child studios make up their overall success, and a circle packing chart to show the best performing directors for the best performing studio.
+      The data was taken from SaiVamshiAtukuri's dataset "Collections of top grossing movies" on Kaggle, and the link for the dataset is the following: https://www.kaggle.com/saivamshi/collections-of-top-grossing-movies/version/2/. Once the data was collected, I ran the data through a python script to join the different CSV files into a single CSV file to use, called movies.csv.
+      In movies.csv, there are 1000 records for the number of movies in the dataset, and the columns for the file are the following: Rank, Movie_ID, Movie_Name, Director, Year, US_Distributor, Lifetime_Gross, Budget, MPAA, Running_Time, and Genre.
+    </p>
 
   </head>
 
@@ -15,15 +23,24 @@
 
 
   <body>
-    
+
     <div style="text-align: center;">
       <a href="index2.html"><button>Scene 2</button></a>
       <a href="index4.html"><button>Scene 4</button></a>
     </div>
 
+    <h3> Donut Chart of Walt Disney Studio's children studios </h3>
+
     <div id="chart"></div>
 
     <script src = "donut.js" aysnc></script>
+
+    <p>
+      The third scene of the Interactive Slideshow Narrative Visualization is a donut chart to show how much each individual studio makes up for the success of the most successful major studio, Walt Disney Studios. 
+      The two interactive parameters for the donut chart are Total Lifetime Gross and Movie Count in the top 1000 grossing films.
+      After seeing that Walt Disney Studios was the most successful major studio when compared to the others, I wanted to see further in-depth how much each child studio makes up its success.
+      The 4 child studios that make up Walt Disney Studios are Walt Disney Studios Motion Pictures, Twentieth Century Fox, Fox Searchlight Pictures, and UTV Motion Pictures, with the latter three being acquisitions. I chose a donut chart to see how well each studio has performed as the tooltip shows both how each studio has performed and what percentage of the major studio it has accounted for. Also, it is important to note that the tooltip will only work once one of the parameter triggers have been pushed. From the data for both interactive parameters, it was seen that the original Walt Disney Motion Pictures still accounted for more than half of the success of the major studio.
+    </p>
 
 
   </body>
